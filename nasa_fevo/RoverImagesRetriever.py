@@ -1,7 +1,7 @@
 from typing import Dict, List
 from datetime import date, timedelta
 from urllib.parse import urlencode
-import requests
+from nasa_fevo.HttpGetter import HttpGetter
 
 DEFAULT_ROVER = "curiosity"
 DEFAULT_DAYS_TO_GET = "10"
@@ -12,9 +12,9 @@ MAX_DAYS_TO_GET = 30
 
 
 class RoverImagesRetriever():
-    def __init__(self):
-        self._fixed_params = {"camera": "NAVCAM", "api_key": API_KEY}
-
+    def __init__(self, http_getter: HttpGetter):
+        self._fixed_params: dict = {"camera": "NAVCAM", "api_key": API_KEY}
+        self._http_getter: HttpGetter = http_getter
 
     def _get_last_dates(self, days_to_get: int) -> List[str]:
         days_to_get = min(days_to_get, MAX_DAYS_TO_GET)  # cap it
@@ -35,9 +35,9 @@ class RoverImagesRetriever():
         for day in dates:
             url = self._make_url(day, rover)
 
-            resp = requests.get(url)
+            resp = await self._http_getter.get(url)
 
-            day_photos = resp.json().get('photos', [])
+            day_photos = resp.get('photos', [])
             extract_img_src = lambda photo_data: photo_data.get("img_src", "")
 
             # get just the img_src of each photo - and get only max_photos_per_day first photos

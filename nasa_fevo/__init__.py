@@ -2,7 +2,13 @@ from flask import Flask
 from flask import request
 from nasa_fevo.RoverImagesRetrieverWithCache import RoverImagesRetrieverWithCache
 from nasa_fevo.RoverImagesRetriever import DEFAULT_ROVER, DEFAULT_IMAGES_PER_DAY, DEFAULT_DAYS_TO_GET
-from nasa_fevo.InMemoryCache import InMemoryCache
+from nasa_fevo.InMemoryCache import InMemoryCache, CACHE_EXPIRATION_TIMER_MINUTES
+
+import time
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -11,18 +17,15 @@ def create_app(test_config=None):
     cache = InMemoryCache()
     retriever = RoverImagesRetrieverWithCache(cache)
 
-    # if test_config is None:
-    #     # load the instance config, if it exists, when not testing
-    #     app.config.from_pyfile('config.py', silent=True)
-    # else:
-    #     # load the test config if passed in
-    #     app.config.from_mapping(test_config)
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        func=lambda: cache.purge_expired(), trigger="interval",
+        minutes=CACHE_EXPIRATION_TIMER_MINUTES
+    )
+    scheduler.start()
 
-    # # ensure the instance folder exists
-    # try:
-    #     os.makedirs(app.instance_path)
-    # except OSError:
-    #     pass
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
 
     # a simple page that says hello
     @app.route('/')

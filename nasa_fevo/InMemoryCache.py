@@ -2,6 +2,8 @@ from typing import Dict, Union
 from nasa_fevo.Cache import Cache
 from datetime import datetime
 
+CACHE_EXPIRATION_TIMER_MINUTES = 10
+
 
 # very simple in-memory cache
 # meant for small # of items
@@ -14,15 +16,16 @@ class InMemoryCache(Cache):
         if val_exp is None:
             return None
         else:
+            print(f"Cache hit: {key}")
             return val_exp[0]
 
     def put(self, key: str, value: object, expiration: datetime) -> None:
         if value is None:
             raise ValueError("Value mustn't be None")
         self.store[key] = (value, expiration)
-        self.purge_expired()
 
     def purge_expired(self) -> None:
+        print("Trying to purge ...")
         keys_to_delete = []
 
         now = datetime.now()
@@ -31,7 +34,7 @@ class InMemoryCache(Cache):
             # value = item[1][0]
             expiration = item[1][1]
             if expiration < now:
-                print(f"key={key}, now={now} > exp={expiration}")
+                # print(f"Purging cache: key={key}, now={now} > exp={expiration}")
                 keys_to_delete.append(key)
 
         for key in keys_to_delete:
