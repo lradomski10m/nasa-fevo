@@ -27,4 +27,4 @@ http://127.0.0.1:5000/get_photos?days=5&imgs-per-day=10)
 
 ## Notes
 - basic in-memory caching implemented (can easily be replaced with other type of caching)
-- some shortcuts taken (e.g. use of requests-async instead of aiohttp)
+- some shortcuts taken (e.g. use of requests-async instead of aiohttp, API key kept in bit-bucket - should be build-time secret)
