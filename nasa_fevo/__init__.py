@@ -9,7 +9,6 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
