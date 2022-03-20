@@ -2,6 +2,7 @@ from typing import Dict, List
 from datetime import date, timedelta
 from urllib.parse import urlencode
 from nasa_fevo.HttpGetter import HttpGetter
+import asyncio
 
 DEFAULT_ROVER = "curiosity"
 DEFAULT_DAYS_TO_GET = "10"
@@ -32,11 +33,17 @@ class RoverImagesRetriever():
 
         all_photos = {}
 
+        reqs = []
+
         for day in dates:
             url = self._make_url(day, rover)
+            reqs.append(asyncio.ensure_future(self._http_getter.get(url)))
 
-            resp = await self._http_getter.get(url)
+        resps = await asyncio.gather(*reqs)
 
+        for day_resp in zip(dates, resps):
+            day = day_resp[0]
+            resp = day_resp[1]
             day_photos = resp.get('photos', [])
             extract_img_src = lambda photo_data: photo_data.get("img_src", "")
 

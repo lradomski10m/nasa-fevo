@@ -1,4 +1,4 @@
-import requests
+import requests_async as requests
 
 
 class HttpGetter():
@@ -6,5 +6,5 @@ class HttpGetter():
         pass
 
     async def get(self, url: str) -> object:
-        resp = requests.get(url).json()
-        return resp
+        resp = await requests.get(url)
+        return resp.json()

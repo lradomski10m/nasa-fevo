@@ -14,9 +14,13 @@ While the web server is running locally execute:
 - curl http://127.0.0.1:5000/get_photos
 
 The following variations are also supported
-- curl http://127.0.0.1:5000/get_photos?days=5&imgs-per-day=10
+- curl http://127.0.0.1:5000/get_photos\?days=5\&imgs-per-day=10
 
-(Or type the http:// url in the browser)
+(characters ? and & need to be escaped in bash/zsh - \? or /&)
+
+(Or type the http:// url as-is in the browser, e.g:
+http://127.0.0.1:5000/get_photos?days=5&imgs-per-day=10)
+
 
 ## Notes
 - basic in-memory caching implemented (can easily be replaced with other type of caching)
